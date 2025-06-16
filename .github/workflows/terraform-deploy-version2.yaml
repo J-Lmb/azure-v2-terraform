@@ -45,6 +45,56 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Register Azure Resource Providers if not registered
+        run: |
+          for NAMESPACE in \
+            Microsoft.DataLakeAnalytics \
+            Microsoft.DesktopVirtualization \
+            Microsoft.DBforPostgreSQL \
+            Microsoft.DBforMariaDB \
+            Microsoft.ServiceFabric \
+            Microsoft.DevTestLab \
+            Microsoft.Cdn \
+            Microsoft.Relay \
+            Microsoft.ApiManagement \
+            Microsoft.Cache \
+            Microsoft.AppPlatform \
+            Microsoft.StreamAnalytics \
+            Microsoft.DataProtection \
+            Microsoft.DataMigration \
+            Microsoft.MixedReality \
+            Microsoft.Devices \
+            Microsoft.OperationsManagement \
+            Microsoft.CustomProviders \
+            Microsoft.HealthcareApis \
+            Microsoft.DataFactory \
+            Microsoft.BotService \
+            Microsoft.EventHub \
+            Microsoft.SecurityInsights \
+            Microsoft.NotificationHubs \
+            Microsoft.AVS \
+            Microsoft.RecoveryServices \
+            Microsoft.AppConfiguration \
+            Microsoft.Automation \
+            Microsoft.Databricks \
+            Microsoft.SignalRService \
+            Microsoft.DataLakeStore \
+            Microsoft.ContainerService \
+            Microsoft.HDInsight \
+            Microsoft.Maps \
+            Microsoft.DBforMySQL \
+            Microsoft.PowerBIDedicated \
+            Microsoft.Kusto
+          do
+            STATE=$(az provider show --namespace $NAMESPACE --query "registrationState" -o tsv 2>/dev/null || echo "NotRegistered")
+            if [ "$STATE" != "Registered" ]; then
+              echo "Registering $NAMESPACE..."
+              az provider register --namespace $NAMESPACE
+            else
+              echo "$NAMESPACE is already registered."
+            fi
+          done
+
       - name: Terraform Plan
         #run: terraform plan -lock=false -input=false -var="subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}" -var-file="terraform.tfvars"
         run: |
