@@ -1,13 +1,13 @@
 output "function_app_name" {
-  value = data.azurerm_linux_function_app.argus.name
+  value = azurerm_linux_function_app.argus.name
 }
 
 output "cosmos_db_endpoint" {
-  value = data.azurerm_cosmosdb_account.argus.endpoint
+  value = azurerm_cosmosdb_account.argus.endpoint
 }
 
 output "storage_account_name" {
-  value = data.azurerm_storage_account.argus.name
+  value = azurerm_storage_account.argus.name
 }
 
 output "logic_app_name" {

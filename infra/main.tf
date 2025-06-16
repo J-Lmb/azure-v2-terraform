@@ -43,7 +43,7 @@ resource "azurerm_cosmosdb_sql_container" "documents" {
   resource_group_name = azurerm_resource_group.argus.name
   account_name        = azurerm_cosmosdb_account.argus.name
   database_name       = azurerm_cosmosdb_sql_database.argus.name
-  partition_key_paths  = "/partitionKey"
+  partition_key_paths  = ["/partitionKey"]
   default_ttl         = -1
 }
 
@@ -52,7 +52,7 @@ resource "azurerm_cosmosdb_sql_container" "configuration" {
   resource_group_name = azurerm_resource_group.argus.name
   account_name        = azurerm_cosmosdb_account.argus.name
   database_name       = azurerm_cosmosdb_sql_database.argus.name
-  partition_key_paths  = "/partitionKey"
+  partition_key_paths  = ["/partitionKey"]
   default_ttl         = -1
 }
 

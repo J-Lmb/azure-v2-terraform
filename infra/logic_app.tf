@@ -1,9 +1,8 @@
 resource "azurerm_logic_app_workflow" "argus_logic" {
   name                = "${local.prefix_logic}${var.environmentName}"
   location            = var.location
-  resource_group_name = (
-    try(data.azurerm_resource_group.argus.name, azurerm_resource_group.argus.name)
-  )
+  resource_group_name = azurerm_resource_group.argus.name
+  
 
   workflow_schema = "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
   workflow_version = "1.0.0.0"
