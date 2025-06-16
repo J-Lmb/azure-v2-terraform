@@ -38,9 +38,9 @@ jobs:
           zip -r streamlit-frontend.zip frontend
 
       - name: Azure CLI Login
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          CREDS: ${{ secrets.AZURE_LOGIN_SP_CREDENTIALS }}
 
       - name: Ensure Resource Group Exists
         run: |
