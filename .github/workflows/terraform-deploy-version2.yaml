@@ -38,13 +38,20 @@ jobs:
         with:
           CREDS: ${{ secrets.AZURE_LOGIN_SP_CREDENTIALS }}
 
-    
+      - name: Validate Azure Permissions
+        run: |
+          az login --service-principal -u ${{ secrets.ARM_CLIENT_ID }} -p ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
+          az role assignment list --assignee ${{ secrets.ARM_CLIENT_ID }} --subscription ${{ secrets.ARM_SUBSCRIPTION_ID }} | jq '.[] | select(.roleDefinitionName == "Contributor")'
+      
+      - name: Check Azure Authentication
+        run: |
+          az account show --subscription ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
       - name: Terraform Init
         run: terraform init
 
       - name: Terraform Validate
         run: terraform validate
-
 
       - name: Terraform Plan
         #run: terraform plan -lock=false -input=false -var="subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}" -var-file="terraform.tfvars"
