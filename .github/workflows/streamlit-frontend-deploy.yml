@@ -23,29 +23,36 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Python
+        # Set up the specified Python version (3.11) on the GitHub Actions runner. This ensures the environment matches your app's requirements.
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
+        # Upgrade pip and install all Python dependencies listed in requirements.txt. This ensures all necessary packages for your Streamlit app are available.
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Archive Streamlit app
+        # Create a zip archive of the entire frontend directory. This zip file will be deployed to Azure App Service.
         run: |
           zip -r streamlit-frontend.zip .
 
       - name: Azure CLI Login
+        # Authenticate to Azure using a Service Principal. Credentials are securely provided via GitHub Secrets.
         uses: azure/login@v2
         with:
           CREDS: ${{ secrets.AZURE_LOGIN_SP_CREDENTIALS }}
 
       - name: Ensure Resource Group Exists
+        # Check if the specified Azure resource group exists. If not, create it in the East US region. This is where all related resources will be managed.
         run: |
           az group show --name rg-tfstate || az group create --name "rg-tfstate" --location "EastUS"
 
       - name: Ensure App Service Plan Exists
+        # Check if the App Service Plan exists in the resource group. If not, create a new Linux-based App Service Plan with the B1 (Basic) SKU.
+        # The App Service Plan defines the compute resources for your web app.
         run: |
           if [ -z "$AZURE_WEBAPP_PLAN" ]; then
             echo "AZURE_WEBAPP_PLAN is not set!" && exit 1
@@ -55,11 +62,15 @@ jobs:
           fi
 
       - name: Ensure Web App Exists
+        # Check if the Azure Web App exists. If not, create it using the specified App Service Plan and Python 3.11 runtime.
+        # This is the actual web application that will host your Streamlit app.
         run: |
           az webapp show --name $AZURE_WEBAPP_NAME --resource-group "rg-tfstate" || \
           az webapp create --name $AZURE_WEBAPP_NAME --resource-group "rg-tfstate" --plan $AZURE_WEBAPP_PLAN --runtime "PYTHON:3.11"
 
       - name: Deploy to Azure Web App
+        # Deploy the zipped Streamlit app to the Azure Web App using the official deployment action.
+        # The package path must match where the zip was created. This step uploads and extracts your app on Azure.
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
@@ -67,5 +78,6 @@ jobs:
           package: frontend/streamlit-frontend.zip
 
       - name: Post deployment - Show Web App URL
+        # Output the deployed app's public URL for quick access and verification.
         run: |
           echo "Deployed to: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
