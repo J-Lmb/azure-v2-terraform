@@ -1,4 +1,5 @@
-app_name         = "my-argus-frontend-streamlit"
-resource_group   = "rg-tfstate"
-location         = "EastUS"
-app_service_plan = "my-argus-frontend-plan"
+# Configuration values for Streamlit frontend deployment
+webapp_name            = "my-argus-frontend-streamlit"
+resource_group_name    = "rg-tfstate"
+location               = "East US"
+app_service_plan_name  = "my-argus-frontend-plan"

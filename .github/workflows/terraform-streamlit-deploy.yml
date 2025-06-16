@@ -1,0 +1,108 @@
+# .github/workflows/terraform-streamlit-deploy.yml
+name: Deploy Streamlit Frontend via Terraform
+
+on:
+  push:
+    branches:
+      - main-terraform-frontend
+  workflow_dispatch:
+
+jobs:
+  terraform-deploy:
+    name: Terraform Plan & Apply Streamlit Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra_frontend
+    
+    env:
+      # Terraform authentication variables
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      
+      # Application deployment variables
+      AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
+      AZURE_WEBAPP_PLAN: ${{ secrets.AZURE_WEBAPP_PLAN }}
+
+    steps:
+      - name: Checkout repository
+        # Download the repository code including Terraform files and Streamlit app
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        # Set up Python 3.11 for building the Streamlit application package
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Streamlit dependencies
+        # Install Python dependencies in the frontend directory to prepare for packaging
+        run: |
+          cd ../frontend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Archive Streamlit app
+        # Create a deployment package of the Streamlit application
+        run: |
+          cd ../frontend
+          zip -r ../infra_frontend/streamlit-frontend.zip .
+
+      - name: Setup Terraform
+        # Install the specified version of Terraform for infrastructure provisioning
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7
+
+      - name: Azure CLI Login
+        # Authenticate to Azure using Service Principal for both Terraform and deployment operations
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_LOGIN_SP_CREDENTIALS }}
+
+      - name: Terraform Init
+        # Initialize Terraform working directory and download required providers
+        run: terraform init
+
+      - name: Terraform Validate
+        # Validate Terraform configuration files for syntax and consistency
+        run: terraform validate
+
+      - name: Terraform Plan
+        # Generate and review the execution plan showing what infrastructure changes will be made
+        run: |
+          terraform plan \
+            -var="webapp_name=${{ env.AZURE_WEBAPP_NAME }}" \
+            -var="app_service_plan_name=${{ env.AZURE_WEBAPP_PLAN }}" \
+            -var="resource_group_name=rg-tfstate" \
+            -var="location=East US" \
+            -out=tfplan
+
+      - name: Terraform Apply
+        # Apply the Terraform plan to create/update Azure infrastructure
+        run: |
+          terraform apply -auto-approve tfplan
+
+      - name: Deploy Streamlit Application
+        # Deploy the zipped Streamlit app to the provisioned Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: 'production'
+          package: streamlit-frontend.zip
+
+      - name: Configure App Settings
+        # Set the startup command for the Streamlit application to ensure it runs correctly on Azure App Service
+        run: |
+          az webapp config set \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group rg-tfstate \
+            --startup-file "streamlit run app.py --server.port=8000 --server.address=0.0.0.0"
+
+      - name: Post deployment - Show Web App URL
+        # Output the deployed application URL and Azure Portal link for verification
+        run: |
+          echo "🚀 Streamlit app deployed to: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
+          echo "📊 Azure Portal: https://portal.azure.com/#@/resource/subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/rg-tfstate/providers/Microsoft.Web/sites/${{ env.AZURE_WEBAPP_NAME }}"
