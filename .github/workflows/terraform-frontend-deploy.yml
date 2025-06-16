@@ -4,7 +4,7 @@ name: Deploy Streamlit Frontend to Azure with Terraform
 on:
   push:
     branches:
-      - main
+      - main-FE
   workflow_dispatch:
 
 jobs:

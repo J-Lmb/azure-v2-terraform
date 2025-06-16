@@ -4,7 +4,7 @@ name: Deploy Streamlit Frontend to Azure App Service
 on:
   push:
     branches:
-      - main2
+      - main
   workflow_dispatch:
 
 jobs:
