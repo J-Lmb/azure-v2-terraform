@@ -34,8 +34,7 @@ jobs:
 
       - name: Archive Streamlit app
         run: |
-          cd ..
-          zip -r streamlit-frontend.zip frontend
+          zip -r streamlit-frontend.zip .
 
       - name: Azure CLI Login
         uses: azure/login@v2
@@ -65,7 +64,7 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'production'
-          package: ../streamlit-frontend.zip
+          package: streamlit-frontend.zip
 
       - name: Post deployment - Show Web App URL
         run: |
