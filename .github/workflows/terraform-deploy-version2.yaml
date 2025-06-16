@@ -4,23 +4,12 @@ name: Deploy ARGUS (Provision if Missing)
 on:
   push:
     branches:
-      - version-v2
+      - main
 
 jobs:
   terraform:
     name: Terraform Plan & Apply (Version 2)
     runs-on: ubuntu-latest
-
-    env:
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-
-       # Terraform variables come in as TF_VAR_<var_name>
-      TF_VAR_azure_openai_endpoint:              ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-      TF_VAR_azure_openai_key:                   ${{ secrets.AZURE_OPENAI_KEY }}
-      TF_VAR_azure_openai_model_deployment_name: ${{ secrets.AZURE_OPENAI_MODEL_DEPLOYMENT_NAME }}
 
     defaults:
       run:
@@ -92,6 +81,17 @@ jobs:
 
 
       - name: Terraform Init
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+          # Terraform variables come in as TF_VAR_<var_name>
+          TF_VAR_azure_openai_endpoint:              ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          TF_VAR_azure_openai_key:                   ${{ secrets.AZURE_OPENAI_KEY }}
+          TF_VAR_azure_openai_model_deployment_name: ${{ secrets.AZURE_OPENAI_MODEL_DEPLOYMENT_NAME }}
+
         run: terraform init
 
       - name: Terraform Validate
