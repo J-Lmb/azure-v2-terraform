@@ -44,12 +44,13 @@ jobs:
 
       - name: Ensure Resource Group Exists
         run: |
-          az group show --name "rg-tfstate" || az group create --name "rg-tfstate" --location "EastUS"
+          az group show --name rg-tfstate || az group create --name "rg-tfstate" --location "EastUS"
 
       - name: Ensure App Service Plan Exists
         run: |
-          az appservice plan show --name $AZURE_WEBAPP_PLAN --resource-group "rg-tfstate" || \
-          az appservice plan create --name $AZURE_WEBAPP_PLAN --resource-group "rg-tfstate" --sku B1 --is-linux
+          if ! az appservice plan show --name $AZURE_WEBAPP_PLAN --resource-group rg-tfstate; then
+            az appservice plan create --name $AZURE_WEBAPP_PLAN --resource-group rg-tfstate --sku B1 --is-linux
+          fi
 
       - name: Ensure Web App Exists
         run: |
