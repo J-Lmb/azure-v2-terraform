@@ -36,11 +36,6 @@ jobs:
         uses: azure/login@v2
         with:
           CREDS: ${{ secrets.AZURE_LOGIN_SP_CREDENTIALS }}
-          
-      - name: Azure CLI Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Terraform Init
         run: terraform init
