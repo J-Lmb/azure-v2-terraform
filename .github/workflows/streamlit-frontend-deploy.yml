@@ -48,8 +48,11 @@ jobs:
 
       - name: Ensure App Service Plan Exists
         run: |
-          if ! az appservice plan show --name $AZURE_WEBAPP_PLAN --resource-group rg-tfstate; then
-            az appservice plan create --name $AZURE_WEBAPP_PLAN --resource-group rg-tfstate --sku B1 --is-linux
+          if [ -z "$AZURE_WEBAPP_PLAN" ]; then
+            echo "AZURE_WEBAPP_PLAN is not set!" && exit 1
+          fi
+          if ! az appservice plan show --name "$AZURE_WEBAPP_PLAN" --resource-group rg-tfstate; then
+            az appservice plan create --name "$AZURE_WEBAPP_PLAN" --resource-group rg-tfstate --sku B1 --is-linux
           fi
 
       - name: Ensure Web App Exists
