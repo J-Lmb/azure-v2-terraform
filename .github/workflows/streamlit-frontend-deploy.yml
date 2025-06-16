@@ -64,7 +64,7 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'production'
-          package: streamlit-frontend.zip
+          package: frontend/streamlit-frontend.zip
 
       - name: Post deployment - Show Web App URL
         run: |
