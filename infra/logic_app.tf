@@ -13,7 +13,7 @@ resource "azurerm_logic_app_workflow" "argus_logic" {
     "$connections" = jsonencode({
       "value" = {
         "azureblob" = {
-          "connectionId" = "/subscriptions/${var.subscription_id}/resourceGroups/${try(data.azurerm_resource_group.argus.name, azurerm_resource_group.argus.name)}/providers/Microsoft.Web/connections/azureblob"
+          "connectionId" = "/subscriptions/${var.subscription_id}/resourceGroups/${azurerm_resource_group.argus.name}/providers/Microsoft.Web/connections/azureblob"
           "connectionName" = "azureblob"
           "id" = "/subscriptions/${var.subscription_id}/providers/Microsoft.Web/locations/${var.location}/managedApis/azureblob"
         }
