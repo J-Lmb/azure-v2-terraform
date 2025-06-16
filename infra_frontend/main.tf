@@ -1,21 +1,14 @@
-# Create or reference the resource group for the frontend resources
-resource "azurerm_resource_group" "frontend" {
-  name     = var.resource_group_name
-  location = var.location
-
-  tags = {
-    Environment = "Production"
-    Application = "StreamlitFrontend"
-    ManagedBy   = "Terraform"
-  }
+# Reference the existing resource group (created by previous deployments)
+data "azurerm_resource_group" "frontend" {
+  name = var.resource_group_name
 }
 
 # Create App Service Plan for hosting the Streamlit application
 # Using Linux with B1 SKU for cost-effective deployment
 resource "azurerm_service_plan" "frontend" {
   name                = var.app_service_plan_name
-  location            = azurerm_resource_group.frontend.location
-  resource_group_name = azurerm_resource_group.frontend.name
+  location            = data.azurerm_resource_group.frontend.location
+  resource_group_name = data.azurerm_resource_group.frontend.name
   os_type             = "Linux"
   sku_name            = "B1"
 
@@ -29,8 +22,8 @@ resource "azurerm_service_plan" "frontend" {
 # Create Linux Web App for Streamlit application
 resource "azurerm_linux_web_app" "frontend" {
   name                = var.webapp_name
-  location            = azurerm_resource_group.frontend.location
-  resource_group_name = azurerm_resource_group.frontend.name
+  location            = data.azurerm_resource_group.frontend.location
+  resource_group_name = data.azurerm_resource_group.frontend.name
   service_plan_id     = azurerm_service_plan.frontend.id
 
   site_config {
