@@ -162,6 +162,7 @@ jobs:
 - **Application Error Page**: Usually means the app failed to start. Check:
   - The main file is named `app.py` and is at the root of the zip.
   - All dependencies are in `requirements.txt`.
+  - We need to think about Port Binding: Streamlit must listen on port 8000 and address 0.0.0.0 for Azure.
   - Set the Startup Command in Azure Portal to:
     ```
     streamlit run app.py --server.port=8000 --server.address=0.0.0.0

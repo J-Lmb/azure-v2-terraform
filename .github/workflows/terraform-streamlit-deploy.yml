@@ -72,6 +72,7 @@ jobs:
 
       - name: Terraform Plan
         # Generate and review the execution plan showing what infrastructure changes will be made
+        # Now using data sources to reference existing resources instead of creating them
         run: |
           terraform plan \
             -var="webapp_name=${{ env.AZURE_WEBAPP_NAME }}" \
@@ -81,7 +82,7 @@ jobs:
             -out=tfplan
 
       - name: Terraform Apply
-        # Apply the Terraform plan to create/update Azure infrastructure
+        # Apply the Terraform plan - now only references existing resources via data sources
         run: |
           terraform apply -auto-approve tfplan
 
