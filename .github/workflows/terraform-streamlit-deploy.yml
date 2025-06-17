@@ -92,7 +92,7 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'production'
-          package: streamlit-frontend.zip
+          package: infra_frontend/streamlit-frontend.zip
 
       - name: Configure App Settings
         # Set the startup command for the Streamlit application to ensure it runs correctly on Azure App Service

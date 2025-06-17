@@ -155,6 +155,7 @@ jobs:
 - **Deploy to Azure Web App**: Uploads and deploys the zipped app to Azure App Service.
 - **Post deployment**: Prints the deployed app's URL.
 
+⚠️Ps: The Azure CLI Login step in your workflow authenticates the GitHub Actions runner to your Azure subscription using a service principal. This authentication is required so that subsequent steps—such as running Terraform commands to provision infrastructure and deploying your Streamlit app to Azure App Service—have the necessary permissions to access and manage Azure resources securely and automatically. Without this login, the workflow would not be able to interact with your Azure environment.
 ---
 
 ## 6. Troubleshooting

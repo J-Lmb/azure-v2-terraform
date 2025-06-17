@@ -114,6 +114,7 @@ The workflow triggers automatically on:
 12. **Configure Settings** - Sets Streamlit startup command
 13. **Output URLs** - Shows deployment and portal links
 
+⚠️Ps: The Azure CLI Login step in your workflow authenticates the GitHub Actions runner to your Azure subscription using a service principal. This authentication is required so that subsequent steps—such as running Terraform commands to provision infrastructure and deploying your Streamlit app to Azure App Service—have the necessary permissions to access and manage Azure resources securely and automatically. Without this login, the workflow would not be able to interact with your Azure environment.
 ---
 
 ## 🔧 Customization Options
